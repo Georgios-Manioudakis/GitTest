@@ -2,24 +2,33 @@ import numpy as np
 
 
 
-
+#Analytiska lösningen för positionen i x-led
 def xt(v0, t):
     vx = v0*np.cos(2*np.pi/9)
     return (((-(0.001)**2)*vx-0.020-vx)*np.exp(-0.001*t)-np.cos(t)*0.020* \
             (0.001**2)-0.020*0.001*np.sin(t)+((0.001**2)+1)*(0.020+vx)) / \
                 (((0.001**2)+1)*0.001)
 
+
+
+#Analytiska lösningen för positionen i y-led
 def yt(v0 , t):
     vy = v0*np.sin(2*np.pi/9)
     return ((-vy*0.001-9.82)*np.exp(-0.001*t)+(-9.82*t+vy)*0.001+9.82) / \
         (0.001**2)
 
+
+#Funktion för L2-felen
 def eN(xtn, xn, ytn, yn):
     return (np.sqrt((xtn - xn)**2 + (ytn -yn)**2))
 
+
+#Funktion för konvergensen
 def q(en1, en2, k1, k2):
     return np.log10(en1/en2) / np.log10(k1/k2)
 
+
+#Funktion för omskrivning av modellen. Returnerar matris med hastigheterna och accelerationerna i x-led och y-led
 def F(t,u):
     x  = u[0]
     y  = u[1]
@@ -27,19 +36,15 @@ def F(t,u):
     vy = u[3]
     return np.array([vx, vy, -c*vx + a*np.sin(t), -c*vy-g])
 
+
+#Begynnelsevillkor
 g= 9.82
 k = [1, 0.5, 0.25, 0.125]
 theta = 2*np.pi/9
 T = 4
-N1 = int(T/k[0])
-N2 = int(T/k[1])
-N3 = int(T/k[2])
-N4 = int(T/k[3])
 v0 = 40
 c = 0.001
 a = 0.020
-
-#beg data
 x0 = 0
 y0 = 0
 x0_t = v0*np.cos(theta)
@@ -47,12 +52,22 @@ y0_t = v0*np.sin(theta)
 vx0 = x0_t
 vy0 = y0_t
 
+#Antal tidssteg
+N1 = int(T/k[0])
+N2 = int(T/k[1])
+N3 = int(T/k[2])
+N4 = int(T/k[3])
+
+
+
 f = np.array([x0,y0,vx0,vy0])
 
+#Tiden
 t1 = np.linspace(0, 4, N1+1)
 t2 = np.linspace(0, 4, N2+1)
 t3 = np.linspace(0, 4, N3+1)
 t4 = np.linspace(0, 4, N4+1)
+
 
 u1 = np.zeros((N1+1,4),dtype = float)
 u2 = np.zeros((N2+1,4),dtype = float)
@@ -64,6 +79,8 @@ u2[0,:] = f
 u3[0,:] = f
 u4[0,:] = f
 
+
+#Egendefinierad RK4
 def RK4(k_):
     f = np.array([0,0,40*np.cos(2*np.pi/9),40*np.sin(2*np.pi/9)])
     N = int(4/k_)
@@ -78,15 +95,15 @@ def RK4(k_):
         u[n+1,:] = u[n,:] + k_/6*(w1+2*w2+2*w3+w4)
     return u
 
-yrk4 = RK4(k[3])[0:, 1:2]
-xrk4 = RK4(k[1])[0:, 0:1]
+# yrk4 = RK4(k[3])[0:, 1:2]
+# xrk4 = RK4(k[1])[0:, 0:1]
 
 #print('RK4(k[0]): \n', RK4(k[0]), '\n')
 #print('RK4(k[1]): \n', RK4(k[1]), '\n')
-print('xrk4: \n', xrk4, '\n')
-print('xt(40, t2): \n', xt(40, t2), '\n')
-print('yrk4: \n', yrk4, '\n\n')
-print('yt(40, t4): \n', yt(40, t4), '\n')
+# print('xrk4: \n', xrk4, '\n')
+# print('xt(40, t2): \n', xt(40, t2), '\n')
+# print('yrk4: \n', yrk4, '\n\n')
+# print('yt(40, t4): \n', yt(40, t4), '\n')
 
 #RK4-lösning för x
 xN1 = RK4(k[0])[0:, 0:1][-1]
@@ -122,7 +139,7 @@ L2_2 = eN(AnX2, xN2, AnY2, yN2)
 L2_3 = eN(AnX3, xN3, AnY3, yN3)
 L2_4 = eN(AnX4, xN4, AnY4, yN4)
 
-print(L2_1, type(L2_1))
+print(L2_1)
 print(L2_2)
 print(L2_3)
 print(L2_4, '\n')
