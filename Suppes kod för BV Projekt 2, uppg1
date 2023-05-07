@@ -1,0 +1,108 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.integrate as ode
+
+def vxled(t, vt): 
+    return -c*vt - aa*np.sin(t)
+
+def vyled(t, vt):
+    return -c*vt - g
+
+def rk4(t, x0, v0, k, func, o):
+    
+    vv = [v0]
+    x = [x0]
+    for i in range(0, o + 1):
+        dv1 = k * func(t[i],vv[i])
+        dx1 = k * vv[i]
+        
+        dv2= k * func(t[i]+k/2,vv[i] + dv1/2)
+        dx2 = k * (vv[i] + dv1/2)
+        
+        dv3= k * func(t[i]+k/2, vv[i] + dv2/2)
+        dx3= k * (vv[i] + dv2/2)
+        
+        dv4= k * func(t[i] +k, vv[i] + dv3)
+        dx4= k * (vv[i] + dv3)
+        
+        vv.append(vv[i] + (1/6)*(dv1+2*dv2+2*dv3+dv4))
+        x.append(x[i] + (1/6)*(dx1+2*dx2+2*dx3+dx4))
+    
+    return x, vv
+
+
+c = 0.001
+g = 9.82
+aa = 0.02
+v0 = 40
+tät = 40
+t = 4
+
+k = 1
+k2 = 0.5
+k3 = 0.25
+k4 = 0.125
+
+N = int(t/k)
+N2 = int(t/k2)
+N3 = int(t/k3)
+N4 = int(t/k4)
+
+t1 = np.arange(0, 5, k)
+t2 = np.arange(0, 5, k2)
+t3 = np.arange(0, 5, k3)
+t4 = np.arange(0, 5, k4)
+
+vx = v0*np.cos(tät)
+vy = v0*np.sin(tät)
+
+x = [((-(c**2)*vx - aa - vx)*np.exp(-c*t) - np.cos(t)*aa*(c**2) - np.sin(t)*aa*c + ((c**2) +1)*(aa + vx))/((1 + c**2)*c) for t in t1]
+x2 = [((-(c**2)*vx - aa - vx)*np.exp(-c*t) - np.cos(t)*aa*(c**2) - np.sin(t)*aa*c + ((c**2) +1)*(aa + vx))/((1 + c**2)*c) for t in t2]
+x3 = [((-(c**2)*vx - aa - vx)*np.exp(-c*t) - np.cos(t)*aa*(c**2) - np.sin(t)*aa*c + ((c**2) +1)*(aa + vx))/((1 + c**2)*c) for t in t3]
+x4 = [((-(c**2)*vx - aa - vx)*np.exp(-c*t) - np.cos(t)*aa*(c**2) - np.sin(t)*aa*c + ((c**2) +1)*(aa + vx))/((1 + c**2)*c) for t in t4]
+
+y = [((-vy*c - g)*np.exp(-c*t) + (-g*t + vy)*c + g)/(c**2) for t in t1]
+y2 = [((-vy*c - g)*np.exp(-c*t) + (-g*t + vy)*c + g)/(c**2) for t in t2]
+y3 = [((-vy*c - g)*np.exp(-c*t) + (-g*t + vy)*c + g)/(c**2) for t in t3]
+y4 = [((-vy*c - g)*np.exp(-c*t) + (-g*t + vy)*c + g)/(c**2) for t in t4]
+
+xx, vvx = rk4(t1, 0, vx, k, vxled, N)
+xx2, vvx2 = rk4(t2, 0, vx, k2, vxled, N2)
+xx3, vvx3 = rk4(t3, 0, vx, k3, vxled, N3)
+xx4, vvx4 = rk4(t4, 0, vx, k4, vxled, N4)
+
+yy , vvy = rk4(t1, 0, vy, k, vyled, N)
+yy2 , vvy2 = rk4(t2, 0, vy, k2, vyled, N2)
+yy3 , vvy3 = rk4(t3, 0, vy, k3, vyled, N3)
+yy4 , vvy4 = rk4(t4, 0, vy, k4, vyled, N4)
+
+
+ey1 = np.abs([y[i] - yy[i] for i in range(len(yy) -1)])
+ey2 = np.abs([y2[i] - yy2[i] for i in range(len(yy2) -1)])
+ey3 = np.abs([y3[i] - yy3[i] for i in range(len(yy3) -1)])
+ey4 = np.abs([y4[i] - yy4[i] for i in range(len(yy4) -1)])
+
+ex1 = np.abs([x[i] - xx[i] for i in range(len(xx) -1)])
+ex2 = np.abs([x2[i] - xx2[i] for i in range(len(xx2) -1)])
+ex3 = np.abs([x3[i] - xx3[i] for i in range(len(xx3) -1)])
+ex4 = np.abs([x4[i] - xx4[i] for i in range(len(xx4) -1)])
+
+qx12 = [(np.log(ex1[i]/ex2[i]))/np.log(k/k2) for i in range(1, len(ex1) -1)]
+qy12 = [(np.log(ey1[i]/ey2[i]))/np.log(k/k2) for i in range(1, len(ey1) -1)]
+
+qx23 = [(np.log(ex2[i]/ex3[i]))/np.log(k2/k3) for i in range(1, len(ex2) -1)]
+qy23 = [(np.log(ey2[i]/ey3[i]))/np.log(k2/k3) for i in range(1, len(ey2) -1)]
+
+qx34 = [(np.log(ex3[i]/ex4[i]))/np.log(k3/k4) for i in range(1, len(ex3) -1)]
+qy34 = [(np.log(ey3[i]/ey4[i]))/np.log(k3/k4) for i in range(1, len(ey3) -1)]
+
+# print('y- led med analytisk lösning, k = 1:', y, '\ny - led med numerisk lösning, k = 1:', yy)
+# print('\ny- led med analytisk lösning, k = 0.5:', y2, '\n', yy2)
+# print('\nx- led med analytisk lösning, k = 1:', x, '\nx - led med numerisk lösning, k = 1:', xx)
+# print('\nx- led med analytisk lösning, k = 0.5:', x2, '\nx - led med numerisk lösning, k = 0.5:', xx2)
+
+
+print(ey1, ey2)
+# print('konvergens x 1,2:',qx12, '\n\nkonvergens y 1,2:',qy12,'\n\nkonvergens x 2,3:', qx23, '\n\nkonvergens y 2,3:',qy23, '\n\nkonvergens x 3,4:',qx34,'\n\nkonvergens y 3,4:', qy34)
+# intressant, när tidsstegen är mindre så sjunker värdena för q mkt snabbare, att lösningen dör ut????
+# elr att den går snabbare mot det riktiga värdet? vad betyder det när den är negativ, matematiskt att faktorn är mindre än 0????
