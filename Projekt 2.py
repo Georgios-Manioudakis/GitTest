@@ -209,7 +209,7 @@ print(K_23)
 print(K_34)
 print(K_41)
 
-felnorm1=np.linalg.norm((RK4(k[0])[N1,:]) - xt(40,t1))
+felnorm1=np.linalg.norm(np.transpose(RK4(k[1])[0:, 0:1]) - xt(40,t2))
 felnorm2=np.linalg.norm(np.transpose(RK4(k[1])[0:, 0:1]) - xt(40,t2))
 felnorm3=np.linalg.norm(np.transpose(RK4(k[2])[0:, 0:1]) - xt(40,t3))
 felnorm4=np.linalg.norm(np.transpose(RK4(k[3])[0:, 0:1]) - xt(40,t4))
