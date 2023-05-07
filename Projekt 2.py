@@ -70,10 +70,6 @@ import numpy as np
 
 
 
-
-
-#Emils försök på uppgift 1
-
 def xt(v0, t):
     vx = v0*np.cos(2*np.pi/9)
     return (((-(0.001)**2)*vx-0.020-vx)*np.exp(-0.001*t)-np.cos(t)*0.020* \
@@ -208,21 +204,6 @@ print(K_12)
 print(K_23)
 print(K_34)
 print(K_41)
-
-felnorm1=np.linalg.norm(np.transpose(RK4(k[1])[0:, 0:1]) - xt(40,t2))
-felnorm2=np.linalg.norm(np.transpose(RK4(k[1])[0:, 0:1]) - xt(40,t2))
-felnorm3=np.linalg.norm(np.transpose(RK4(k[2])[0:, 0:1]) - xt(40,t3))
-felnorm4=np.linalg.norm(np.transpose(RK4(k[3])[0:, 0:1]) - xt(40,t4))
-print("Felnormen blir {}.".format(felnorm1))
-print("Felnormen blir {}.".format(felnorm2))
-print("Felnormen blir {}.".format(felnorm3))
-print("Felnormen blir {}.".format(felnorm4))
-
-
-
-
-#slut på emils försök
-
 
 
 
