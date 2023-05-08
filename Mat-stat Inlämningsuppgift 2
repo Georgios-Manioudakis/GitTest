@@ -1,0 +1,298 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import statsmodels.api as st
+import scipy as sp
+from scipy.stats import t
+
+
+# # Uppgift 1
+# 
+# Vid planering av en forskningsstudie används simulerade slumptal $x_1,...,x_n$ från en viss slumpvariabel $X$, vilka beräknas med den så kallade inversmetoden enligt $x_k=6(1-(1-u_k)^{1/2})$, där u-värdena är rektangelfördelade slumptal på intervallet [0,1].  
+# 
+
+# 
+# ## 1a) 
+#     Beräkna täthetsfunktionen för X
+# 
+
+# $x = 6(1-(1-u)^{1/2})$
+# $\hspace{0.5cm}$
+# $\iff$
+# $\hspace{0.5cm}$
+# $6\sqrt{1-u} = 6 - x$
+# $\hspace{0.5cm}$
+# $\iff$
+# $\hspace{0.5cm}$
+# $1 - u = \frac{1}{36} (6 - x)^2$
+# $\hspace{0.5cm}$
+# $\iff$
+# $\hspace{0.5cm}$
+# $u = \frac{36 - (6 - x)^2}{36}$
+# $\hspace{0.5cm}$
+# $\iff$
+# $\hspace{0.5cm}$
+# $u = \frac{1}{36} (12x - x^2)$
+# 
+# Men, u = F(x), det vill säga fördelningsfunktionen, alltså deriverar vi för att få täthetsfunktionen. 
+# 
+# Täthetsfunktionen är: $f(x) = \frac{1}{3} - \frac{x}{18}$
+# 
+
+# 
+# ## 1b)
+#     Ta fram 600 slumptal från X-fördelningen och rita upp ett normerat histogram för dessa.  Jämför med resultatet i uppgift a)
+# 
+
+# In[4]:
+
+
+gen = np.random.default_rng(69)
+u = gen.random(600)
+x = 6*(1 - (1- u)**0.5)
+
+
+# In[8]:
+
+
+fig,ax = plt.subplots()
+ax.hist(x, bins = 20, density=True)
+_x = np.arange(0,6,0.1)
+ax.plot(_x, 1/36 * (12 - 2*_x))
+ax.legend(["täthetsfunktion","simulerad fördelning"])
+ax.set(title = "Simulerad fördelning", xlabel = 'Simulerade slumptal', ylabel = 'Normerat antal simulerade slumptal')
+plt.show()
+fig.savefig('Mat-Sta_Uppg1.png')
+
+
+# Plottade datan stämmer ganska bra överens med täthetsfunktionen från 1a)
+
+# # Uppgift 2
+# 
+#     Maxwell-Boltzmannfördelningen beskriver den typiska partikelhastigheten hos ett stort system av kolliderande partiklar. Fördelningen kan simuleras i python med paketet stats med kommandot maxwell.rvs(a,n) där a är en parameter och n är det önskade antalet slumptal.
+# 
+# ## 2a) 
+#     Undersök med hjälp av simulering hur den typiska fördelningen för partikelhastighet i kvadrat ser ut. Använd några olika parametervärden för a för att se dess påverkan. 
+#    
+#    
+
+# In[37]:
+
+
+n=2000
+x_ = np.arange(0, 2000, 1)
+
+test1 = sp.stats.maxwell.rvs(scale=1, size = n)
+t1 = test1 * test1
+#print(test1, np.mean(test1))
+print(t1, np.mean(t1), np.min(t1), np.max(t1))
+
+
+fig, ax  = plt.subplots()
+ax.set(xlabel = 'Partiklar', ylabel = 'Partikelhastigheterna', title = 'Slumpade partikelhastigheter i kvadrat')
+ax.plot(x_, t1, '.', label = 'Partikelhastigheterna i kvadrat')
+ax.axhline(np.mean(t1), color = 'r', label = 'Medelvärdet av partikelhastigheterna i kvadrat')
+plt.legend()
+plt.show()
+fig.savefig('Mat-Sta_Uppg2_1a.png')
+
+
+# In[81]:
+
+
+fig, ax  = plt.subplots()
+ax.set(xlabel = 'Partikelhastigheten i kvadrat', ylabel = 'Antal partiklar med den hastigheten', title = 'Histogram av partikelhastigheter i kvadrat, med loc = none, scale=1, size = n')
+plt.hist(t1, bins= 200, density=False, label='Histogram')
+ax.axvline(np.mean(t1), color = 'r', label = 'Medelvärde av hastigheterna')
+plt.legend()
+plt.show()
+fig.savefig('Mat-Sta_Uppg2_1b.png')
+
+
+# In[77]:
+
+
+test2 = sp.stats.maxwell.rvs(loc = 10, scale=1, size = n)
+t2 = test2 * test2
+#print(test2, np.mean(test2))
+print(t2, np.mean(t2), np.min(t2), np.max(t2))
+
+fig, ax  = plt.subplots()
+ax.set(xlabel = 'Partikelhastigheten i kvadrat', ylabel = 'Antal partiklar med den hastigheten', title = 'Histogram av partikelhastigheter i kvadrat, med loc = 10, scale=1, size = n')
+plt.hist(t2, bins= 100, density=False, label='Histogram')
+ax.axvline(np.mean(t2), color = 'r', label = 'Medelvärde av hastigheterna')
+plt.legend()
+plt.show()
+fig.savefig('Mat-Sta_Uppg2_1c.png')
+
+
+# In[76]:
+
+
+test3 = sp.stats.maxwell.rvs(loc = 10, scale = 5, size = n)
+t3 = test3 * test3
+#print(test3, np.mean(test3))
+print(t3, np.mean(t3), np.min(t3), np.max(t3))
+
+fig, ax  = plt.subplots()
+ax.set(xlabel = 'Partikelhastigheten i kvadrat', ylabel = 'Antal partiklar med den hastigheten', title = 'Histogram av partikelhastigheter i kvadrat, med loc = 10, scale = 5, size = n')
+plt.hist(t3, bins= 100, density=False, label='Histogram')
+ax.axvline(np.mean(t3), color = 'r', label = 'Medelvärde av hastigheterna')
+plt.legend()
+plt.show()
+fig.savefig('Mat-Sta_Uppg2_1d.png')
+
+
+# # Uppgift 3
+# 
+
+# 
+# ## 3a)
+#     I ett experiment utsattes objekt med olika massor för samma (okända) kraft varvid accelerationen uppmättes.  Resultaten finns i datafilen constantforce.csv. Vi vill analysera resultatet med hjälp av linjär regression. Vilken storhet bör uppfattas som oberoende, vilken som beroende? Varför?  Ta fram en punktskattning av kraften och konstruera ett lämpligt konfidensintervall.   
+# 
+
+# 
+
+# In[83]:
+
+
+data = pd.read_csv("constantforce.csv")
+#print(data)
+data2 = st.add_constant(data)
+#print(data2)
+print(data2.head())
+
+model2 = st.OLS(data2['acceleration(m/s²)'], data2[["const","mass(kg)"]])
+r2 = model2.fit()
+
+print(r2.summary())
+
+
+# In[84]:
+
+
+data2['Force'] = data2['acceleration(m/s²)'] * data2['mass(kg)']
+
+punk = np.mean(data2['Force'])
+print('Punktskattningen av kraften =',punk, 'N')
+
+
+# In[85]:
+
+
+model3 = st.OLS(data2['Force'], data['mass(kg)'])
+#print(data.head())
+
+r3 = model3.fit()
+print(r3.summary())
+
+
+# 
+# ## 3b)
+#      Illustrera undersökningen grafiskt på lämpligt sätt.  Beräkna förklaringsgraden och ge en tolkning.
+#      
+
+# In[90]:
+
+
+fig, ax = plt.subplots()
+ax.set(xlabel = 'Massan / [kg]', ylabel = 'Acceleration / [kgm/s**2]', title = 'Accelerationen som funktion av massan')
+plt.plot(data2['mass(kg)'], data2['acceleration(m/s²)'], '.', label = 'Acceleration som funktion av massan')
+plt.plot(data2['mass(kg)'], -0.1425*data2['mass(kg)'] + 1.7937, label = 'Linjära anpassningen')
+plt.plot(data2['mass(kg)'], -0.1425*data2['mass(kg)'] + 1.7937 - 0.322875087, color='red', label = '$\pm$ std')
+plt.plot(data2['mass(kg)'], -0.1425*data2['mass(kg)'] + 1.7937 + 0.322875087, color='red')
+plt.fill_between(data2['mass(kg)'], -0.1425*data2['mass(kg)'] + 1.7937 + 0.322875087, -0.1425*data2['mass(kg)']                  + 1.7937 - 0.322875087, alpha=0.5)
+ax.legend()
+plt.show()
+fig.savefig('Mat-Sta_Uppg3_1a.png')
+
+
+# In[100]:
+
+
+s = np.sqrt(sum((data2['Force'] - punk)**2) / len(data2['Force']))
+#print(s)
+
+
+under = punk - 10*(s/np.sqrt(31))
+over = punk + 10*(s/np.sqrt(31))
+#print(under)
+#print(punk)
+#print(over)
+
+fig, ax = plt.subplots()
+ax.set(xlabel = 'Mätpunkter', ylabel = 'Kraften / [N]', title = 'Kraften')
+plt.plot(data2['Force'], '.', label = 'Kraften')
+plt.axhline(punk, color = 'orange', label = 'Punktskattningen')
+plt.axhline(punk + s, color = 'g', label = '$\pm$ std')
+plt.axhline(punk - s, color = 'g')
+
+ax.legend()
+plt.show()
+fig.savefig('Mat-Sta_Uppg3_1b.png')
+
+
+# In[ ]:
+
+
+
+
+
+# 
+
+# # Uppgift 4
+#     Ladda upp datafilen IceCube40StringData.csv. Filen innehåller data för neutrino-observationer gjorda vid anläggningen IceCube i Antarktis.   
+# 
+
+# 
+# ## 4a) 
+#     Använd datamaterialet, speciellt kolumnen MJD, för att ta fram en lista på tidsmellanrummen mellan registrerade neutrinoankomster. Ta fram grundläggande beskrivande statistik, dvs medelvärde, lämpligt spridningsmått, variationskoefficient.
+# 
+
+# In[102]:
+
+
+icedata = pd.read_csv('IceCube40StringData.csv')
+icedf = icedata['MJD']
+print(icedf)
+l = []
+for i in range(1, len(icedf)):
+    l.append(icedf[i] - icedf[i-1])
+Δt = np.array(l)
+print('Array med tidsmellanrum: ', Δt)
+
+medel = np.mean(Δt)
+sa = np.std(Δt)
+vcof = sa/medel
+
+print('Medelvärde: ', medel)
+print("Spridningsmått:", sa)
+print('Variationskoefficient: ', vcof)
+
+
+# 
+# ## 4b)
+#     Undersök statistiskt/grafiskt om det är rimligt att uppfatta mellanankomsttiderna som oberoende, exponentialfördelade stokastiska variabler. Använd därvid momentmetoden för att skatta exponentialfördelningens intensitet. Beskriv kortfattat vad som kan tala för eller emot den föreslagna modellen.  
+
+# In[106]:
+
+
+fig, ax = plt.subplots()
+ax.set(xlabel = 'Mellankomsttiden / [dagar]', ylabel = 'Antalet neutriner med denna mellankomsttid', title = 'Histogram av mellankomsttiderna av detekterade neutrinerna från IceCube')
+plt.hist(Δt, bins=1000, label = 'Histogram')
+ax.legend()
+plt.show()
+fig.savefig('Mat-Sta_Uppg4.png')
+
+#MOment
+#r = sp.stats.moment(Δt, moment=2)
+#print(r)
+
+
+# Det ser väldigt rimligt ut att man kan anta att mellanankomsttiderna är oberoende och exponentialfördelade stokastiska variabler.
