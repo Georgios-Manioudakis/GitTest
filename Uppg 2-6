@@ -26,15 +26,14 @@ def c(c0, y):
     return c0 * np.exp(-1 * 10**(-4) * y)
 
 
-#Accelerationen i x-led
-def x_tt(y, t):
-    return -c(y) * np.abs(v(t)) * (x_t - w(t))
+# #Accelerationen i x-led
+# def x_tt(y, t):
+#     return -c(y) * np.abs(v(t)) * (x_t - w(t))
 
 
-#Accelerationen i y-led
-def y_tt(y, t):
-    return -c(y) * np.abs(v(t)) * y_t - g(y)
-
+# #Accelerationen i y-led
+# def y_tt(y, t):
+#     return -c(y) * np.abs(v(t)) * y_t - g(y)
 
 
 
@@ -45,12 +44,17 @@ def F(t, u):
     x, y, x_t, y_t = u
     Vx = x_t    #Inför nya obekanta
     Vy = y_t    #Inför nya obekanta
-    return np.array([x], [y], [Vx], [Vy])
+    Vx_x = -c(y) * np.abs(v(t)) * (Vx - w(t))
+    Vy_y = -c(y) * np.abs(v(t)) * Vy - g(y)
+    return np.array([Vx], [Vy], [Vx_x], [Vy_y])
 
 
 #Vinden (uppg 2-6)
 def w(t):
     return -20*np.exp(-((t-10)/5)**2)
+
+
+
 
 
 #Inför nya obekanta
@@ -68,3 +72,6 @@ vx = v0 * np.cos(θ)
 vy = v0 * np.sin(θ)
 x_t0 = vx
 y_t0 = vy
+
+
+
