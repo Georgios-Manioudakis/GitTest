@@ -1,19 +1,15 @@
 #Uppgift 2-6
 
 
-
 import numpy as np
 
 
 
+
 #Relativa hastigheten av kanonkulan
-def v(t):
+def v(t, x_t, y_t):
     return np.array([[x_t - w(t)], [y_t]])
 
-
-# #Friktionen
-# def Fd(a, t):
-#     return -a * np.abs(v(t)) * v(t)
 
 
 #Gravitationen beroende av höjden y
@@ -26,17 +22,18 @@ def c(c0, y):
     return c0 * np.exp(-1 * 10**(-4) * y)
 
 
-# #Accelerationen i x-led
-# def x_tt(y, t):
-#     return -c(y) * np.abs(v(t)) * (x_t - w(t))
+# # #Accelerationen i x-led
+# # def x_tt(y, t):
+# #     return -c(y) * np.abs(v(t)) * (x_t - w(t))
 
 
-# #Accelerationen i y-led
-# def y_tt(y, t):
-#     return -c(y) * np.abs(v(t)) * y_t - g(y)
+# # #Accelerationen i y-led
+# # def y_tt(y, t):
+# #     return -c(y) * np.abs(v(t)) * y_t - g(y)
 
-
-
+# # Inför nya obekanta
+# # Vx_t = x_tt
+# # Vy_t = y_tt
 
 
 #Osäkert vad detta är
@@ -44,8 +41,8 @@ def F(t, u):
     x, y, x_t, y_t = u
     Vx = x_t    #Inför nya obekanta
     Vy = y_t    #Inför nya obekanta
-    Vx_x = -c(y) * np.abs(v(t)) * (Vx - w(t))
-    Vy_y = -c(y) * np.abs(v(t)) * Vy - g(y)
+    Vx_x = -c(y) * np.linalg.norm(v(t, Vx, Vy)) * (Vx - w(t))
+    Vy_y = -c(y) * np.linalg.norm(v(t, Vx, Vy)) * Vy - g(y)
     return np.array([Vx], [Vy], [Vx_x], [Vy_y])
 
 
@@ -56,22 +53,39 @@ def w(t):
 
 
 
-
-#Inför nya obekanta
-Vx_t = x_tt
-Vy_t = y_tt
-
-
 #Begynnelsevillkor
 x0 = 0
 y0 = 0
 c0 = 4.518 * 10**(-4)
 v0 = 400
-θ = 45
+θ = np.pi/4
 vx = v0 * np.cos(θ)
 vy = v0 * np.sin(θ)
 x_t0 = vx
 y_t0 = vy
 
+
+
+
+
+
+
+
+k = 0.1
+
+#Egendefinierad RK4
+def RK4(k):
+    f = np.array([0,0,40*np.cos(2*np.pi/9),40*np.sin(2*np.pi/9)])
+    N = int(4/k)
+    t = np.linspace(0, 4, N+1)
+    u = np.zeros((N+1, 4),dtype = float)
+    u[0,:] = f
+    for n in range(N):
+        w1 = F(t[n], u[n])
+        w2 = F(t[n] + k/2, u[n] + k/2 * w1)
+        w3 = F(t[n] + k/2, u[n] + k/2 * w2)
+        w4 = F(t[n+1], u[n] + k * w3)
+        u[n+1] = u[n] + k/6 * (w1 + 2 * w2 + 2 * w3 + w4)
+    return u
 
 
